@@ -1,0 +1,17 @@
+$ kubectl apply -f registry/kubeflow-registry-deploy.yaml
+$ kubectl apply -f registry/kubeflow-registry-svc.yaml
+$ kubectl get svc  kubeflow-registry -o jsonpath='{.spec.clusterIP}'
+X.X.X.X
+$ vi /etc/hosts
+X.X.X.X    kubeflow-registry.default.svc.cluster.local  # add this to /etc/hosts file
+$ cat  /etc/docker/daemon.json     # modify daemon.json file like followings
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2",
+  "insecure-registries": ["kubeflow-registry.default.svc.cluster.local:30000"]
+}
+$ systemctl restart docker
